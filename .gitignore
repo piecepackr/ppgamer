@@ -1,0 +1,13 @@
+*.epub
+*.gif
+*.html
+*.pdf
+*.png
+*.swp
+
+codecov.yml
+README.html
+
+html/
+others/
+tmp/

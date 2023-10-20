@@ -1,0 +1,9 @@
+destination: "../../websites/R/ppgamer/"
+url: "https://trevorldavis.com/R/ppgamer"
+development:
+    mode: auto
+reference:
+    - title: "Piecepack puzzle solvers"
+      desc: "Functions to solve puzzles"
+      contents:
+        - solve_fujisan
