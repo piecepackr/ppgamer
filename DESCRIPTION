@@ -2,13 +2,13 @@ Encoding: UTF-8
 Package: ppgamer
 Type: Package
 Title: Players for Piecepack Games like Fuji-san
-Version: 0.1.0-1
-Authors@R: c(person("Trevor L", "Davis", role=c("aut", "cre"),
+Version: 0.1.1
+Authors@R: c(person("Trevor L.", "Davis", role=c("aut", "cre"),
              email="trevor.l.davis@gmail.com",
              comment = c(ORCID = "0000-0001-6341-4639")))
-Description: Functions that provide players for piecpack games like a solver for "Fuji-san".
+Description: Functions that provide players for piecepack games like a solver for "Fuji-san".
 License: MIT + file LICENSE
-URL: https://github.com/piecepackr/ppgamer
+URL: https://github.com/piecepackr/ppgamer, https://trevorldavis.com/R/ppgamer/
 BugReports: https://github.com/piecepackr/ppgamer/issues
 LazyLoad: yes
 Depends: R (>= 3.4.0)
@@ -26,5 +26,5 @@ Suggests:
     vdiffr,
 Remotes: piecepackr/ppcli, piecepackr/ppn
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Config/testthat/edition: 3

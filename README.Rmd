@@ -1,7 +1,7 @@
 # ppgamer
 
 [![CRAN Status Badge](https://www.r-pkg.org/badges/version/ppgamer)](https://cran.r-project.org/package=ppgamer)
-[![R-CMD-check](https://github.com/piecepackr/ppgamer/workflows/R-CMD-check/badge.svg)](https://github.com/piecepackr/ppgamer/actions)
+[![R-CMD-check](https://github.com/piecepackr/ppgamer/actions/workflows/R-CMD-check.yaml/badge.svg?branch=main)](https://github.com/piecepackr/ppgamer/actions)
 [![codecov](https://codecov.io/github/piecepackr/ppgamer/branch/main/graph/badge.svg)](https://app.codecov.io/github/piecepackr/ppgamer)
 
 ### Table of Contents
