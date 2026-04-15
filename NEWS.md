@@ -1,3 +1,8 @@
+ppgames 0.1.2 (development)
+===========================
+
+* No user-facing changes.
+
 ppgamer 0.1.1
 =============
 
