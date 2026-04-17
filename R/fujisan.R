@@ -128,8 +128,8 @@ path2movetext <- function(p) {
 	}
 	p <- stringr::str_split(p, "_")
 	p <- lapply(p, n2alg)
-	movetext <- character(length(p) - 1)
-	for (ii in seq(length(p) - 1)) {
+	movetext <- character(length(p) - 1L)
+	for (ii in seq_len(length(p) - 1L)) {
 		b <- p[[ii]]
 		a <- p[[ii + 1]]
 		i <- intersect(b, a)
@@ -149,7 +149,7 @@ path2counter_intuitive <- function(p) {
 	p <- stringr::str_split(p, "_")
 	p <- lapply(p, n2alg)
 	n_counter_intuitive <- 0
-	for (ii in seq(length(p) - 1)) {
+	for (ii in seq_len(length(p) - 1L)) {
 		b <- p[[ii]]
 		a <- p[[ii + 1]]
 		i <- intersect(b, a)
@@ -180,6 +180,45 @@ alg2level <- function(alg) {
 	)
 }
 
+parse_fujisan_pawns <- function(pawns) {
+	rows <- strsplit(pawns, "/")[[1]]
+	if (length(rows) != 2L) {
+		abort(str_glue(
+			"The `pawns` string must have exactly one '/' separator but got: {sQuote(pawns)}"
+		))
+	}
+	pos1 <- parse_fujisan_pawn_row(rows[1L], 1L, pawns)
+	pos2 <- parse_fujisan_pawn_row(rows[2L], 2L, pawns)
+	all_pos <- c(pos1, pos2)
+	if (length(all_pos) != 4L) {
+		abort(str_glue(
+			"The `pawns` string must contain exactly 4 pawns but got {length(all_pos)}: {sQuote(pawns)}"
+		))
+	}
+	all_pos
+}
+
+parse_fujisan_pawn_row <- function(row_str, row_num, pawns) {
+	tokens <- regmatches(row_str, gregexpr("[A-Z]|[0-9]+", row_str))[[1]]
+	positions <- integer(0)
+	col <- 1L
+	for (tok in tokens) {
+		if (grepl("^[0-9]+$", tok)) {
+			col <- col + as.integer(tok)
+		} else {
+			offset <- if (row_num == 1L) 0L else 14L
+			positions <- c(positions, offset + col)
+			col <- col + 1L
+		}
+	}
+	if (col != 15L) {
+		abort(str_glue(
+			"Row {row_num} of pawns string {sQuote(pawns)} covers {col - 1L} columns but must cover exactly 14"
+		))
+	}
+	positions
+}
+
 coins2string <- function(coins, sep = "/") {
 	coins <- c(coins[1, ], coins[2, ])
 	coins <- as.character(coins)
@@ -205,12 +244,22 @@ dice2ppn <- function(coins, dice) {
 	}
 }
 
+pawns2ppn <- function(pawns) {
+	if (is.null(pawns) || pawns == "S12M/A12C") {
+		""
+	} else {
+		str_glue('\n  Pawns: "{pawns}"', pawns = pawns)
+	}
+}
+
 sol2ppn <- function(sol) {
 	movetext <- paste(path2movetext(sol$shortest_path), collapse = "\n")
+	is_default_pawns <- is.null(sol$pawns) || sol$pawns == "S12M/A12C"
 	metadata <- str_glue(
-		'---\nGameType:\n  Name: Fujisan\n  Coins: "{coins}"{dice}\n...',
+		'---\nGameType:\n  Name: Fujisan\n  Coins: "{coins}"{dice}{pawns}\n...',
 		coins = coins2string(sol$coins, "/"),
-		dice = dice2ppn(sol$coins, sol$dice)
+		dice = if (is_default_pawns) dice2ppn(sol$coins, sol$dice) else "",
+		pawns = pawns2ppn(sol$pawns)
 	)
 	paste0(metadata, "\n", movetext, "\n")
 }
@@ -235,31 +284,38 @@ first_move_needs_dice <- function(coins) {
 #' Solves a game of Fujisan (if possible).
 #' @param coins A vector or matrix of Fujisan coin layout.  Default is a random layout.
 #' @param dice  A vector of Fujisan dice layout.  Default is random dice.  Usually not needed.
+#' @param pawns A FEN-like string of the pawns position.  The four pawns `S`, `M`, `C`, and
+#'   `A` are represented by their letter and empty spaces by a number.  The two rows are
+#'   separated by `/`.  Default is `"S12M/A12C"` (all pawns at starting corners).
 #' @return A list with solution of Fujisan solution, its length, coin layout, dice (if needed),
-#'         and portable piecepack notation.
-#' @rdname game_solvers
+#'         pawns position, and portable piecepack notation.
 #' @examples
 #'  puzzle2 <- matrix(c(4, 4, 4, 5, 2, 0, 2, 4, 0, 3, 1, 1,
 #'                      1, 2, 5, 3, 3, 5, 3, 2, 5, 1, 0, 0), nrow = 2, byrow = TRUE)
 #'  s2 <- solve_fujisan(coins = puzzle2)
 #'  if (rlang::is_installed(c("piecepackr", "ppn"))) {
 #'    g2 <- ppn::read_ppn(textConnection(s2$ppn))[[1]]
-#'    ppn::plot_move(g2)
+#'    ppn::plot_move(g2, open_device = FALSE)
 #'  }
 #' @export
-solve_fujisan <- function(coins = random_fujisan_coins(), dice = random_dice() - 1) {
+solve_fujisan <- function(
+	coins = random_fujisan_coins(),
+	dice = random_dice() - 1,
+	pawns = "S12M/A12C"
+) {
 	rlang::check_installed("igraph")
 	if (is.vector(coins)) {
 		coins <- process_ranks(coins) - 1
 		coins <- matrix(coins, nrow = 2, byrow = TRUE)
 	}
 	dice <- process_ranks(dice) - 1
+	initial_state <- state2string(parse_fujisan_pawns(pawns))
 
 	edges <- do.call(rbind, apply(get_states(), 2, states2edges, coins, dice))
 	g <- igraph::graph_from_edgelist(edges, directed = TRUE)
 	te <- try(
 		{
-			initial <- igraph::V(g)["1_14_15_28"]
+			initial <- igraph::V(g)[initial_state]
 			final <- igraph::V(g)["7_8_21_22"]
 			d <- igraph::distances(g, v = initial, to = final, mode = "out")
 			d <- as.integer(d)
@@ -272,7 +328,8 @@ solve_fujisan <- function(coins = random_fujisan_coins(), dice = random_dice() -
 	} else {
 		p <- names(igraph::shortest_paths(g, from = initial, to = final)$vpath[[1]])
 	}
-	if (!first_move_needs_dice(coins)) {
+	is_default_pawns <- initial_state == "1_14_15_28"
+	if (!is_default_pawns || !first_move_needs_dice(coins)) {
 		dice <- NA_integer_
 	}
 	sol <- list(
@@ -282,6 +339,7 @@ solve_fujisan <- function(coins = random_fujisan_coins(), dice = random_dice() -
 		dice = dice,
 		coin_string = coins2string(coins),
 		dice_string = dice2string(dice),
+		pawns = pawns,
 		n_counter_intuitive = path2counter_intuitive(p)
 	)
 	sol$ppn <- sol2ppn(sol)

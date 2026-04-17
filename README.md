@@ -13,18 +13,41 @@
 
 ## <a name="overview">Overview</a>
 
-* Currently this package only provides a [Fuji-san](https://www.ludism.org/ppwiki/Fuji-san) solver `solve_fujisan()` which can compute the shortest solution (if it exists) to a given Fuji-san puzzle and output the PPN text to record/visualize the solution.
-* In the future it may provide computer players for other board games and/or puzzles.
-* This is an extraction and refinement of functionality originally contained in the experimental [{ppgames}](https://www.github.com/piecepackr/ppgames) package.
+* Currently this package only provides the following solvers:
+
+  * `solve_dominosa()` which computes a solution (if it exists) to a given [Dominosa](https://www.solitairelaboratory.com/puzzlelaboratory/DominoGG.html).
+  * `solve_fujisan()` which can compute the shortest solution (if it exists) to a given [Fuji-san](https://www.ludism.org/ppwiki/Fuji-san) puzzle and output the PPN text to record/visualize the solution.
 
 ## <a name="installation">Installation</a>
 
 
-```r
+``` r
 remotes::install_github("piecepackr/ppgamer")
 ```
 
 ## <a name="examples">Examples</a>
+
+
+
+
+``` r
+library("ppgamer")
+library("ppn") # `remotes::install_github("piecepackr/ppn")`
+pips <- matrix(c(2, 5, 1, 6, 6, 4, 3, 5,
+                 0, 1, 3, 3, 0, 2, 6, 6,
+	             0, 3, 4, 5, 0, 4, 3, 0,
+				 0, 2, 6, 1, 3, 5, 4, 0,
+	             3, 6, 5, 5, 4, 5, 4, 1,
+	             1, 2, 4, 6, 0, 6, 2, 2,
+	             4, 3, 2, 2, 1, 1, 1, 5
+               ), nrow = 7, byrow = TRUE)
+s <- solve_dominosa(pips = pips)
+game <- read_ppn(textConnection(s$ppn))[[1]]
+envir <- piecepackr::game_systems(round = TRUE)
+plot_move(game, open_device = FALSE, annotate = FALSE, envir = envir, scale = 0.95)
+```
+
+<img src="man/figures/README-dominosa-1.png" alt="Solution to a Dominosa puzzle"  />
 
 ```r
 library("igraph")
@@ -42,7 +65,7 @@ piecepack_suits <- list(suit_text="\U0001f31e,\U0001f31c,\U0001f451,\u269c,\uaa5
                     suit_fontfamily="Noto Emoji,Noto Sans Symbols2,Noto Emoji,Noto Sans Symbols,Noto Sans Cham",
                     suit_cex="0.6,0.7,0.75,0.9,0.9")
 traditional_ranks <- list(use_suit_as_ace=TRUE, rank_text=",a,2,3,4,5")
-cfg3d <- list(width.pawn=0.75, height.pawn=0.75, depth.pawn=0.375, 
+cfg3d <- list(width.pawn=0.75, height.pawn=0.75, depth.pawn=0.375,
                    dm_text.pawn="", shape.pawn="convex6", invert_colors.pawn=TRUE,
                    edge_color.coin="tan", edge_color.tile="tan")
 cfg <- pp_cfg(c(piecepack_suits, dark_colorscheme, traditional_ranks, cfg3d))
@@ -50,7 +73,7 @@ cfg <- pp_cfg(c(piecepack_suits, dark_colorscheme, traditional_ranks, cfg3d))
 animate_game(game, op_scale=1, op_angle=90, trans=op_transform, cfg=cfg, file="fujisan.gif")
 ```
 
-![Animation of a Fuji-san game](https://www.trevorldavis.com/piecepackr/images/knitr/fujisan.gif)
+<img src="https://www.trevorldavis.com/piecepackr/images/knitr/fujisan.gif" alt="Animation of a Fuji-san game"  />
 
 ## <a name="links">Related links</a>
 
