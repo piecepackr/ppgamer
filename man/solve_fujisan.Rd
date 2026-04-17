@@ -21,7 +21,7 @@ separated by \code{/}.  Default is \code{"S12M/A12C"} (all pawns at starting cor
 }
 \value{
 A list with solution of Fujisan solution, its length, coin layout, dice (if needed),
-pawns position, and portable piecepack notation.
+pawn position string, and portable piecepack notation.
 }
 \description{
 Solves a game of Fujisan (if possible).
@@ -29,9 +29,6 @@ Solves a game of Fujisan (if possible).
 \examples{
  puzzle2 <- matrix(c(4, 4, 4, 5, 2, 0, 2, 4, 0, 3, 1, 1,
                      1, 2, 5, 3, 3, 5, 3, 2, 5, 1, 0, 0), nrow = 2, byrow = TRUE)
- s2 <- solve_fujisan(coins = puzzle2)
- if (rlang::is_installed(c("piecepackr", "ppn"))) {
-   g2 <- ppn::read_ppn(textConnection(s2$ppn))[[1]]
-   ppn::plot_move(g2, open_device = FALSE)
- }
+ s <- solve_fujisan(coins = puzzle2)
+ print(s$shortest_distance) # minimum number of moves to solve game
 }
