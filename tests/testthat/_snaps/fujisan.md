@@ -1,3 +1,35 @@
+# parse_fujisan_pawns() works as expected
+
+    Code
+      parse_fujisan_pawns("S12M")
+    Condition
+      Error in `parse_fujisan_pawns()`:
+      ! The `pawns` string must have exactly one '/' separator but got: 'S12M'
+
+---
+
+    Code
+      parse_fujisan_pawns("S12M/A11C")
+    Condition
+      Error in `parse_fujisan_pawn_row()`:
+      ! Row 2 of pawns string 'S12M/A11C' covers 13 columns but must cover exactly 14
+
+---
+
+    Code
+      parse_fujisan_pawns("S13M/A12C")
+    Condition
+      Error in `parse_fujisan_pawn_row()`:
+      ! Row 1 of pawns string 'S13M/A12C' covers 15 columns but must cover exactly 14
+
+---
+
+    Code
+      parse_fujisan_pawns("S13/A12C")
+    Condition
+      Error in `parse_fujisan_pawns()`:
+      ! The `pawns` string must contain exactly 4 pawns but got 3: 'S13/A12C'
+
 # fujisan solver works as expected
 
     Code

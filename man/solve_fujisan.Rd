@@ -4,16 +4,24 @@
 \alias{solve_fujisan}
 \title{Solve Fujisan game}
 \usage{
-solve_fujisan(coins = random_fujisan_coins(), dice = random_dice() - 1)
+solve_fujisan(
+  coins = random_fujisan_coins(),
+  dice = random_dice() - 1,
+  pawns = "S12M/A12C"
+)
 }
 \arguments{
 \item{coins}{A vector or matrix of Fujisan coin layout.  Default is a random layout.}
 
 \item{dice}{A vector of Fujisan dice layout.  Default is random dice.  Usually not needed.}
+
+\item{pawns}{A FEN-like string of the pawns position.  The four pawns \code{S}, \code{M}, \code{C}, and
+\code{A} are represented by their letter and empty spaces by a number.  The two rows are
+separated by \code{/}.  Default is \code{"S12M/A12C"} (all pawns at starting corners).}
 }
 \value{
 A list with solution of Fujisan solution, its length, coin layout, dice (if needed),
-and portable piecepack notation.
+pawns position, and portable piecepack notation.
 }
 \description{
 Solves a game of Fujisan (if possible).
@@ -24,6 +32,6 @@ Solves a game of Fujisan (if possible).
  s2 <- solve_fujisan(coins = puzzle2)
  if (rlang::is_installed(c("piecepackr", "ppn"))) {
    g2 <- ppn::read_ppn(textConnection(s2$ppn))[[1]]
-   ppn::plot_move(g2)
+   ppn::plot_move(g2, open_device = FALSE)
  }
 }

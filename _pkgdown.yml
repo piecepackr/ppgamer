@@ -8,4 +8,5 @@ reference:
     - title: "Piecepack puzzle solvers"
       desc: "Functions to solve puzzles"
       contents:
+        - solve_dominosa
         - solve_fujisan

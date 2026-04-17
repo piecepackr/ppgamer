@@ -5,6 +5,7 @@
 *.png
 *.swp
 
+.claude/
 codecov.yml
 README.html
 
