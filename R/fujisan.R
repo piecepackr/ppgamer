@@ -254,12 +254,12 @@ pawns2ppn <- function(pawns) {
 
 sol2ppn <- function(sol) {
 	movetext <- paste(path2movetext(sol$shortest_path), collapse = "\n")
-	is_default_pawns <- is.null(sol$pawns) || sol$pawns == "S12M/A12C"
+	is_default_pawns <- is.null(sol$pawn_string) || sol$pawn_string == "S12M/A12C"
 	metadata <- str_glue(
 		'---\nGameType:\n  Name: Fujisan\n  Coins: "{coins}"{dice}{pawns}\n...',
 		coins = coins2string(sol$coins, "/"),
 		dice = if (is_default_pawns) dice2ppn(sol$coins, sol$dice) else "",
-		pawns = pawns2ppn(sol$pawns)
+		pawns = pawns2ppn(sol$pawn_string)
 	)
 	paste0(metadata, "\n", movetext, "\n")
 }
@@ -288,15 +288,12 @@ first_move_needs_dice <- function(coins) {
 #'   `A` are represented by their letter and empty spaces by a number.  The two rows are
 #'   separated by `/`.  Default is `"S12M/A12C"` (all pawns at starting corners).
 #' @return A list with solution of Fujisan solution, its length, coin layout, dice (if needed),
-#'         pawns position, and portable piecepack notation.
+#'         pawn position string, and portable piecepack notation.
 #' @examples
 #'  puzzle2 <- matrix(c(4, 4, 4, 5, 2, 0, 2, 4, 0, 3, 1, 1,
 #'                      1, 2, 5, 3, 3, 5, 3, 2, 5, 1, 0, 0), nrow = 2, byrow = TRUE)
-#'  s2 <- solve_fujisan(coins = puzzle2)
-#'  if (rlang::is_installed(c("piecepackr", "ppn"))) {
-#'    g2 <- ppn::read_ppn(textConnection(s2$ppn))[[1]]
-#'    ppn::plot_move(g2, open_device = FALSE)
-#'  }
+#'  s <- solve_fujisan(coins = puzzle2)
+#'  print(s$shortest_distance) # minimum number of moves to solve game
 #' @export
 solve_fujisan <- function(
 	coins = random_fujisan_coins(),
@@ -339,7 +336,7 @@ solve_fujisan <- function(
 		dice = dice,
 		coin_string = coins2string(coins),
 		dice_string = dice2string(dice),
-		pawns = pawns,
+		pawn_string = pawns,
 		n_counter_intuitive = path2counter_intuitive(p)
 	)
 	sol$ppn <- sol2ppn(sol)
